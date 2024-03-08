@@ -1,12 +1,12 @@
-from services.user_service import UserService
-from conftest import setup_logging
+from helpers.user_helper import UserHelper
+from helpers.base_helper import setup_logging
 
 logger = setup_logging()
 
 
 # POST: Creates list of users with given input array
 def test_create_users_with_array():
-    user_service = UserService("https://petstore.swagger.io/v2")
+    user_service = UserHelper("https://petstore.swagger.io/v2")
     users = [
         {
             "id": 1,
@@ -36,12 +36,18 @@ def test_create_users_with_array():
 
     logger.info(f"Received response: {new_users}")
 
-    assert new_users["message"] == "ok", f"Expected message is ok, but got {new_users['message']}"
+    if new_users.status_code == 200:
+        new_users = new_users.json()
+
+        assert new_users["message"] == "ok", f"Expected message is ok, but got {new_users['message']}"
+
+    else:
+        assert False, f"Expected status code 200, but got {new_users.status_code}"
 
 
 # PUT: Updated user
 def test_update_user():
-    user_service = UserService("https://petstore.swagger.io/v2")
+    user_service = UserHelper("https://petstore.swagger.io/v2")
     user_name = "User1"
     update_user_data = {
         "id": 123,
@@ -60,6 +66,12 @@ def test_update_user():
 
     logger.info(f"Received response: {updated_user_info}")
 
-    assert updated_user_info["code"] == 200, f"Expected code is 200, but got {updated_user_info['code']}"
-    assert updated_user_info["message"] == str(update_user_data[
-        "id"]), f"Expected message {update_user_data['id']}, but got {updated_user_info['status']}"
+    if updated_user_info.status_code == 200:
+        updated_user_info = updated_user_info.json()
+
+        assert updated_user_info["code"] == 200, f"Expected code is 200, but got {updated_user_info['code']}"
+        assert updated_user_info["message"] == str(update_user_data[
+            "id"]), f"Expected message {update_user_data['id']}, but got {updated_user_info['status']}"
+
+    else:
+        assert False, f"Expected status code 200, but got {updated_user_info.status_code}"
