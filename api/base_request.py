@@ -16,7 +16,7 @@ class BaseRequester:
         response = requests.request(method, url, json=data, files=files)
         self.log_request_response(response)
         if response.status_code != expected_status:
-            raise ValueError(f"Unexpected status code: {response.status_code}")
+            assert False, f"Unexpected status code: {response.status_code}"
         return response
 
     def log_request_response(self, response):
